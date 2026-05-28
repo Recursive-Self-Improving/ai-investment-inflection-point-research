@@ -7,7 +7,7 @@
 ---
 
 <p id="daily-report-link"></p>
-<p>🤖 <a href="https://github.com/recursive-self-improving/ai-investment-inflection-point-research">github repo</a></p>
+<p>🤖 <a href="https://github.com/Recursive-Self-Improving/ai-investment-inflection-point-research">github repo</a></p>
 <script>
   (function() {
     const now = new Date();
