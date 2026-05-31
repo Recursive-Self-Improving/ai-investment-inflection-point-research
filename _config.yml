@@ -1,0 +1,18 @@
+title: "AI Investment Inflection Point Research"
+description: "Markdown-first financial research reports on AI investment inflection points, rendered as a readable GitHub Pages research desk."
+
+# GitHub Pages compatible Markdown rendering.
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter: rouge
+
+
+# Apply the presentation shell to every Markdown document without requiring
+# front matter in the existing reports.
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"

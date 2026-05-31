@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="{{ page.lang | default: site.lang | default: 'zh-Hans' }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark light">
+    <title>{% if page.title %}{{ page.title | escape }} · {% endif %}{{ site.title | default: 'AI Investment Inflection Point Research' | escape }}</title>
+    <meta name="description" content="{{ page.description | default: site.description | default: 'AI investment inflection point research reports.' | strip_html | normalize_whitespace | truncate: 160 | escape }}">
+    <meta name="generator" content="Jekyll">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% if page.title %}{{ page.title | escape }} · {% endif %}{{ site.title | default: 'AI Investment Inflection Point Research' | escape }}">
+    <meta property="og:description" content="{{ page.description | default: site.description | default: 'AI investment inflection point research reports.' | strip_html | normalize_whitespace | truncate: 200 | escape }}">
+    <meta property="og:url" content="{{ page.url | absolute_url }}">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="{{ page.url | absolute_url }}">
+    <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+    <script src="{{ '/assets/js/page.js' | relative_url }}" defer></script>
+  </head>
+  <body>
+    {% assign repository_url = site.github.repository_url | default: 'https://github.com/Recursive-Self-Improving/ai-investment-inflection-point-research' %}
+    <header class="site-masthead" aria-label="Site header">
+      <div class="site-masthead__inner">
+        <a class="site-brand" href="{{ '/' | relative_url }}" aria-label="{{ site.title | default: 'AI Investment Inflection Point Research' | escape }} home">
+          <span class="site-brand__mark" aria-hidden="true">AI</span>
+          <span class="site-brand__text">{{ site.title | default: 'AI Investment Inflection Point Research' | escape }}</span>
+        </a>
+        <a class="site-github" href="{{ repository_url }}" rel="noopener noreferrer">GitHub</a>
+      </div>
+    </header>
+
+    <main class="page-shell" id="content" tabindex="-1">
+      <article class="research-document">
+        {{ content }}
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>Generated research notes rendered with a static GitHub Pages presentation layer. Not financial advice.</p>
+    </footer>
+  </body>
+</html>
