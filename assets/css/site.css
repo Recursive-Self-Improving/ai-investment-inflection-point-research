@@ -284,9 +284,6 @@ th, td {
 th:last-child, td:last-child { border-right: 0; }
 tr:last-child > td { border-bottom: 0; }
 th {
-  position: sticky;
-  top: 3.9rem;
-  z-index: 3;
   background: #20251f;
   color: #f4dca8;
   font-weight: 800;
