@@ -12,6 +12,57 @@ from typing import Iterable
 
 TRUNCATED_URL_RE = re.compile(r"https?://\S*(?:\.\.\.|…)\S*")
 FOOTNOTE_DEF_RE = re.compile(r"^\[\^[^\]]+\]:", re.MULTILINE)
+REQUIRED_15_THEMES = [
+    "训练算力",
+    "推理算力",
+    "存储",
+    "内存",
+    "网络",
+    "数据中心",
+    "端侧",
+    "软件",
+    "agent",
+    "AI 医药",
+    "自动驾驶",
+    "具身智能",
+    "机器人",
+    "AI 看见世界",
+    "AI 感受时间",
+    "AI 安全",
+    "AI 数据",
+    "推理成本下降",
+]
+REQUIRED_GLOBAL_MARKETS = [
+    "美股",
+    "A股",
+    "港股",
+    "台股",
+    "日股",
+    "韩股",
+    "欧洲",
+    "ETF",
+    "期权",
+]
+REQUIRED_PRICING_DIMENSIONS = [
+    "1m",
+    "3m",
+    "6m",
+    "12m",
+    "估值",
+    "target",
+    "分析师",
+    "期权",
+    "机构",
+    "新闻热度",
+    "short",
+]
+FIRST_PRINCIPLES_TERMS = [
+    "新能力",
+    "新瓶颈",
+    "谁付钱",
+    "钱从哪里来",
+    "利润池",
+]
 FORBIDDEN_REPORT_MARKERS = [
     "## Response",
     "Current Session Context",
@@ -61,6 +112,26 @@ def validate_report(report_path: Path) -> list[str]:
         errors.append("正式报告缺少 ## 10. 交易员版本结论")
     if not FOOTNOTE_DEF_RE.search(text):
         errors.append("正式报告没有脚注来源定义")
+
+    if "15方向" not in text and "15 个重点方向" not in text and "十五" not in text:
+        errors.append("正式报告缺少 15方向覆盖说明")
+    for theme in REQUIRED_15_THEMES:
+        if theme not in text:
+            errors.append(f"正式报告缺少 15方向覆盖关键词: {theme}")
+
+    if "全球市场" not in text and "跨市场" not in text:
+        errors.append("正式报告缺少全球/跨市场覆盖说明")
+    for market in REQUIRED_GLOBAL_MARKETS:
+        if market not in text:
+            errors.append(f"正式报告缺少全球市场覆盖关键词: {market}")
+
+    for dim in REQUIRED_PRICING_DIMENSIONS:
+        if dim not in text:
+            errors.append(f"正式报告缺少市场未定价维度: {dim}")
+
+    for term in FIRST_PRINCIPLES_TERMS:
+        if term not in text:
+            errors.append(f"正式报告缺少第一性原理链条字段: {term}")
 
     for marker in FORBIDDEN_REPORT_MARKERS:
         if marker in text:

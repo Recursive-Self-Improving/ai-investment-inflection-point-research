@@ -40,6 +40,11 @@ def test_report_validator_accepts_full_url(tmp_path: Path):
         "---\n"
         "# AI产业投资转折点研究报告\n\n"
         "![short skirts clip](../assets/short_skirts_clip.png)\n\n"
+        "## 1. 元数据\n\n"
+        "15方向覆盖说明：训练算力、推理算力、存储、内存、网络、数据中心、端侧、软件、agent、AI 医药、自动驾驶、具身智能、机器人、AI 看见世界、AI 感受时间、AI 安全、AI 数据、推理成本下降。\n\n"
+        "全球市场覆盖说明：美股、A股、港股、台股、日股、韩股、欧洲、ETF、期权、跨市场。\n\n"
+        "市场未定价维度：1m、3m、6m、12m、估值、target、分析师、期权、机构、新闻热度、short。\n\n"
+        "第一性原理链条：新能力 → 新瓶颈 → 谁付钱 → 钱从哪里来 → 利润池。\n\n"
         "## 2. 一页结论\n\n"
         "## 10. 交易员版本结论\n\n"
         "## 脚注\n\n"
@@ -48,6 +53,29 @@ def test_report_validator_accepts_full_url(tmp_path: Path):
     )
 
     assert validate_report(report) == []
+
+
+def test_report_validator_rejects_missing_structural_coverage(tmp_path: Path):
+    report = tmp_path / "report.md"
+    report.write_text(
+        "---\n"
+        "报告撰写日期: 2026-06-09\n"
+        "下次更新建议: 2026-06-24（Micron 财报）\n"
+        "---\n"
+        "# AI产业投资转折点研究报告\n\n"
+        "![short skirts clip](../assets/short_skirts_clip.png)\n\n"
+        "## 2. 一页结论\n\n"
+        "## 10. 交易员版本结论\n\n"
+        "[^1]: Reuters, https://www.reuters.com/world/asia-pacific/example-2026-06-07/\n",
+        encoding="utf-8",
+    )
+
+    errors = validate_report(report)
+
+    assert any("15方向" in err for err in errors)
+    assert any("全球市场" in err for err in errors)
+    assert any("市场未定价维度" in err for err in errors)
+    assert any("第一性原理" in err for err in errors)
 
 
 def test_summary_validator_rejects_long_report_sections(tmp_path: Path):
