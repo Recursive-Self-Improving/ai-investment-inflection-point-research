@@ -6,6 +6,7 @@ This script is intentionally boring. Boring QA saves you from publishing clown-f
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from pathlib import Path
 from typing import Iterable
@@ -90,6 +91,30 @@ def _find_truncated_urls(text: str) -> list[tuple[int, str]]:
     return [(_line_no(text, m.start()), m.group(0).rstrip(".,);]")) for m in TRUNCATED_URL_RE.finditer(text)]
 
 
+def _report_date_from_path(report_path: Path) -> str | None:
+    m = re.search(r"(20\d{2}-\d{2}-\d{2})", str(report_path))
+    return m.group(1) if m else None
+
+
+def _stage2_json_with_found_returns(report_path: Path) -> Path | None:
+    """Return same-day Stage 2 market-pricing JSON if it contains usable return rows."""
+    report_date = _report_date_from_path(report_path)
+    if not report_date:
+        return None
+    repo_root = report_path.resolve().parents[1]
+    stage2_path = repo_root / ".run" / report_date / "stage2_market_pricing.json"
+    if not stage2_path.exists():
+        return None
+    try:
+        data = json.loads(stage2_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    rows = data.get("rows", [])
+    if any(isinstance(row, dict) and row.get("chart_returns_status") == "found" for row in rows):
+        return stage2_path
+    return None
+
+
 def validate_report(report_path: Path) -> list[str]:
     errors: list[str] = []
     if not report_path.exists():
@@ -139,6 +164,31 @@ def validate_report(report_path: Path) -> list[str]:
 
     for line, url in _find_truncated_urls(text):
         errors.append(f"正式报告含截断 URL: line {line}: {url}")
+
+    stage2_path = _stage2_json_with_found_returns(report_path)
+    if stage2_path is not None:
+        forbidden_claims = [
+            "仓库内未发现2026",
+            "仓库内未发现 2026",
+            "阶段2市场定价pack缺失",
+            "阶段2市场定价 pack缺失",
+            "阶段2市场定价 pack 缺失",
+            "未发现当天阶段2市场定价pack",
+            "未发现当天阶段2市场定价 pack",
+            "当日全市场return snapshot不重建",
+            "当天全市场return snapshot不重建",
+            "当日全市场 return snapshot 不重建",
+            "当天全市场 return snapshot 不重建",
+            "Yahoo chart API均返回HTTP 429",
+            "Yahoo chart API 均返回HTTP 429",
+            "Yahoo chart API 均返回 HTTP 429",
+        ]
+        for claim in forbidden_claims:
+            if claim in text:
+                errors.append(
+                    "正式报告与同日 Stage 2 JSON 冲突: "
+                    f"{stage2_path} 已有 found return rows，但报告仍包含 `{claim}`"
+                )
 
     return errors
 
