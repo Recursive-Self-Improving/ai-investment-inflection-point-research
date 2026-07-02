@@ -3,12 +3,14 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="dark light">
-    <title>{% if page.title %}{{ page.title | escape }} · {% endif %}{{ site.title | default: 'AI Investment Inflection Point Research' | escape }}</title>
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbfbfa">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#16181b">
+    <title>{% if page.title %}{{ page.title | escape }} · {% elsif page.dir != '/' %}{{ page.name | remove: '.md' }} · {% endif %}{{ site.title | default: 'AI Investment Inflection Point Research' | escape }}</title>
     <meta name="description" content="{{ page.description | default: site.description | default: 'AI investment inflection point research reports.' | strip_html | normalize_whitespace | truncate: 160 | escape }}">
     <meta name="generator" content="Jekyll">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="{% if page.title %}{{ page.title | escape }} · {% endif %}{{ site.title | default: 'AI Investment Inflection Point Research' | escape }}">
+    <meta property="og:title" content="{% if page.title %}{{ page.title | escape }} · {% elsif page.dir != '/' %}{{ page.name | remove: '.md' }} · {% endif %}{{ site.title | default: 'AI Investment Inflection Point Research' | escape }}">
     <meta property="og:description" content="{{ page.description | default: site.description | default: 'AI investment inflection point research reports.' | strip_html | normalize_whitespace | truncate: 200 | escape }}">
     <meta property="og:url" content="{{ page.url | absolute_url }}">
     <meta name="twitter:card" content="summary">
@@ -18,24 +20,82 @@
   </head>
   <body>
     {% assign repository_url = site.github.repository_url | default: 'https://github.com/Recursive-Self-Improving/ai-investment-inflection-point-research' %}
-    <header class="site-masthead" aria-label="Site header">
-      <div class="site-masthead__inner">
-        <a class="site-brand" href="{{ '/' | relative_url }}" aria-label="{{ site.title | default: 'AI Investment Inflection Point Research' | escape }} home">
-          <span class="site-brand__mark" aria-hidden="true">AI</span>
-          <span class="site-brand__text">{{ site.title | default: 'AI Investment Inflection Point Research' | escape }}</span>
+    {% comment %} 报告页都在日期子目录下（/2026-07/ 等）；首页（README）dir 为 '/'。 {% endcomment %}
+    {% assign reports = site.pages | where_exp: "p", "p.dir != '/'" | sort: "url" %}
+
+    <a class="skip-link" href="#content">跳到正文</a>
+
+    <header class="masthead">
+      <div class="masthead-inner">
+        <a class="brand" href="{{ '/' | relative_url }}">
+          <span class="brand-mark" aria-hidden="true">转</span>
+          <span class="brand-text">AI 投资转折点研究</span>
         </a>
-        <a class="site-github" href="{{ repository_url }}" rel="noopener noreferrer">GitHub</a>
+        <a class="masthead-repo" href="{{ repository_url }}" rel="noopener noreferrer">GitHub</a>
       </div>
     </header>
 
-    <main class="page-shell" id="content" tabindex="-1">
-      <article class="research-document">
-        {{ content }}
-      </article>
-    </main>
+    {% if page.dir != '/' %}
+      {% assign prev_report = nil %}
+      {% assign next_report = nil %}
+      {% for p in reports %}
+        {% if p.url == page.url %}
+          {% unless forloop.first %}
+            {% assign prev_index = forloop.index0 | minus: 1 %}
+            {% assign prev_report = reports[prev_index] %}
+          {% endunless %}
+          {% unless forloop.last %}
+            {% assign next_index = forloop.index0 | plus: 1 %}
+            {% assign next_report = reports[next_index] %}
+          {% endunless %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+      <nav class="tape" aria-label="按日期浏览报告">
+        {% if prev_report %}
+          <a class="tape-prev" href="{{ prev_report.url | relative_url }}" rel="prev">‹ {{ prev_report.name | remove: '.md' }}</a>
+        {% else %}
+          <span class="tape-mute tape-prev">首期</span>
+        {% endif %}
+        <span class="tape-current"><span class="tape-tag">日报</span>{{ page.name | remove: '.md' }}</span>
+        {% if next_report %}
+          <a class="tape-next" href="{{ next_report.url | relative_url }}" rel="next">{{ next_report.name | remove: '.md' }} ›</a>
+        {% else %}
+          <span class="tape-mute tape-next">最新一期</span>
+        {% endif %}
+      </nav>
+    {% endif %}
+
+    <div class="page-body">
+      <nav class="toc" id="toc" hidden aria-label="目录">
+        <p class="toc-label">目录</p>
+        <ol class="toc-list"></ol>
+      </nav>
+      <main id="content" tabindex="-1">
+        <article class="report">
+          {{ content }}
+          {% if page.url == '/' and reports.size > 0 %}
+            <section class="archive" aria-label="报告档案">
+              <h2 id="archive">报告档案</h2>
+              {% assign months = reports | group_by_exp: "p", "p.dir" %}
+              {% for month in months reversed %}
+                <div class="archive-month">
+                  <h3 class="archive-month-label">{{ month.name | remove: '/' }}</h3>
+                  <ul class="archive-days">
+                    {% for p in month.items reversed %}
+                      <li><a href="{{ p.url | relative_url }}">{{ p.name | remove: '.md' | slice: 5, 5 }}</a></li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              {% endfor %}
+            </section>
+          {% endif %}
+        </article>
+      </main>
+    </div>
 
     <footer class="site-footer">
-      <p>Generated research notes rendered with a static GitHub Pages presentation layer. Not financial advice.</p>
+      <p>报告由 AI 生成，不构成投资建议（NFA）。<a href="{{ repository_url }}" rel="noopener noreferrer">源码仓库</a></p>
     </footer>
   </body>
 </html>
