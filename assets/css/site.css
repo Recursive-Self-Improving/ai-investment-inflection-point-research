@@ -1,7 +1,8 @@
 /* ---------------------------------------------------------------------------
  * AI 投资转折点研究 · 「交易台日报」presentation layer
- * 扁平、高对比、数据优先。红涨绿跌遵循 A 股配色惯例（红=涨，绿=跌）。
- * 纯系统字体：站点需要在中国大陆可访问，不引外部字体/CDN。
+ * 扁平、高对比、数据优先。结构层保持纯墨色，页面上唯一的颜色是行情数据：
+ * 涨跌配色按美股/西方惯例（绿=涨，红=跌）。
+ * 字体：Noto Sans SC（正文/标题）+ IBM Plex Mono（数据/纸带），Google Fonts 加载。
  * ------------------------------------------------------------------------- */
 
 :root {
@@ -13,16 +14,18 @@
   --faint: #8a9099;
   --line: #e4e6e8;
   --line-strong: #c6cad0;
-  --up: #c2271f;
-  --down: #0b7a52;
-  --up-tint: rgba(194, 39, 31, 0.07);
+  --up: #15803d;
+  --down: #c22a24;
+  --mark: rgba(250, 204, 21, 0.22);
+  --focus: #2563eb;
   --measure: 46rem;
   --wide: 96rem;
   --radius: 8px;
-  --sans: system-ui, -apple-system, "PingFang SC", "HarmonyOS Sans SC", "MiSans",
-    "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, "Cascadia Mono", Menlo,
-    Consolas, "Liberation Mono", monospace;
+  --sans: "Noto Sans SC", system-ui, -apple-system, "PingFang SC",
+    "HarmonyOS Sans SC", "MiSans", "Microsoft YaHei", "Noto Sans CJK SC",
+    "Source Han Sans SC", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", SFMono-Regular,
+    "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
 * { box-sizing: border-box; }
@@ -57,10 +60,10 @@ a {
   transition: color 140ms ease, text-decoration-color 140ms ease,
     border-color 140ms ease, background-color 140ms ease;
 }
-a:hover { color: var(--up); text-decoration-color: currentColor; }
+a:hover { text-decoration-color: currentColor; text-decoration-thickness: 2px; }
 
 :focus-visible {
-  outline: 2px solid var(--up);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
   border-radius: 2px;
 }
@@ -82,7 +85,7 @@ a:hover { color: var(--up); text-decoration-color: currentColor; }
 /* --- 报头 ------------------------------------------------------------------ */
 
 .masthead {
-  border-top: 3px solid var(--up);
+  border-top: 3px solid var(--ink);
   border-bottom: 1px solid var(--line);
 }
 
@@ -110,8 +113,8 @@ a:hover { color: var(--up); text-decoration-color: currentColor; }
   width: 1.75rem;
   height: 1.75rem;
   border-radius: 4px;
-  background: var(--up);
-  color: #fff;
+  background: var(--ink);
+  color: var(--bg);
   font-size: 1rem;
   font-weight: 700;
   line-height: 1;
@@ -137,7 +140,7 @@ a:hover { color: var(--up); text-decoration-color: currentColor; }
   padding: 0.32rem 0.6rem;
   line-height: 1;
 }
-.masthead-repo:hover { color: var(--up); border-color: var(--up); }
+.masthead-repo:hover { color: var(--ink); border-color: var(--ink); }
 
 /* --- 日期纸带（上一日 / 当日 / 下一日） ------------------------------------ */
 
@@ -156,7 +159,7 @@ a:hover { color: var(--up); text-decoration-color: currentColor; }
 }
 
 .tape a { text-decoration: none; color: var(--muted); }
-.tape a:hover { color: var(--up); }
+.tape a:hover { color: var(--ink); }
 .tape-prev { justify-self: start; overflow: hidden; text-overflow: ellipsis; }
 .tape-next { justify-self: end; overflow: hidden; text-overflow: ellipsis; }
 .tape-mute { color: var(--faint); }
@@ -164,7 +167,7 @@ a:hover { color: var(--up); text-decoration-color: currentColor; }
 .tape-mute.tape-next { justify-self: end; }
 
 .tape-current { justify-self: center; font-weight: 600; letter-spacing: 0.04em; }
-.tape-tag { color: var(--up); margin-right: 0.55em; font-weight: 700; }
+.tape-tag { color: var(--ink); margin-right: 0.55em; font-weight: 700; }
 
 /* --- 页面主体：目录栏 + 正文 ------------------------------------------------ */
 
@@ -208,7 +211,7 @@ h1:first-child, h2:first-child, h3:first-child { margin-top: 0; }
 
 h1 {
   font-size: clamp(1.7rem, 1.3rem + 2vw, 2.5rem);
-  font-weight: 800;
+  font-weight: 900;
   line-height: 1.22;
   letter-spacing: -0.01em;
   margin-block: 0 1em;
@@ -219,10 +222,10 @@ h3 { font-size: clamp(1.08rem, 1rem + 0.5vw, 1.25rem); }
 h4, h5, h6 { font-size: 1rem; }
 
 .sec-num {
-  color: var(--up);
+  color: var(--muted);
   font-family: var(--mono);
   font-size: 0.76em;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.06em;
   margin-right: 0.5em;
 }
@@ -239,7 +242,7 @@ h4, h5, h6 { font-size: 1rem; }
 }
 :is(h1, h2, h3, h4, h5, h6):hover > .heading-anchor,
 .heading-anchor:focus-visible { opacity: 1; }
-.heading-anchor:hover { color: var(--up); }
+.heading-anchor:hover { color: var(--ink); }
 
 /* --- 正文元素 --------------------------------------------------------------- */
 
@@ -293,7 +296,7 @@ pre {
 }
 pre code { font-size: 0.84rem; }
 
-/* --- 涨跌语义色（JS 标注 ±x.x%；符号本身保留，颜色仅是冗余编码） ------------ */
+/* --- 涨跌语义色（JS 标注 ±x.x%；美股惯例绿涨红跌，符号保留，颜色仅是冗余编码） */
 
 .pct {
   font-family: var(--mono);
@@ -390,7 +393,7 @@ sup a {
   color: var(--faint);
   text-decoration: none;
 }
-sup a:hover { color: var(--up); }
+sup a:hover { color: var(--ink); }
 
 .footnotes {
   margin-top: 3.5rem;
@@ -403,7 +406,7 @@ sup a:hover { color: var(--up); }
 .footnotes ol { padding-left: 1.4em; }
 .footnotes li { overflow-wrap: anywhere; break-inside: avoid; }
 .footnotes li:target {
-  background: var(--up-tint);
+  background: var(--mark);
   border-radius: 4px;
   color: var(--ink);
 }
@@ -442,7 +445,7 @@ sup a:hover { color: var(--up); }
   text-decoration: none;
   color: var(--ink);
 }
-.archive-days a:hover { color: var(--up); border-color: var(--up); }
+.archive-days a:hover { border-color: var(--ink); background: var(--surface); }
 
 /* --- 页脚 ------------------------------------------------------------------ */
 
@@ -497,8 +500,8 @@ sup a:hover { color: var(--up); }
   }
   .toc-list a:hover { color: var(--ink); border-left-color: var(--line-strong); }
   .toc-list a.active {
-    color: var(--up);
-    border-left-color: var(--up);
+    color: var(--ink);
+    border-left-color: var(--ink);
     font-weight: 600;
   }
   .toc-num {
@@ -543,12 +546,11 @@ sup a:hover { color: var(--up); }
     --faint: #6f7680;
     --line: #292d33;
     --line-strong: #3d4249;
-    --up: #f97066;
-    --down: #3dd68c;
-    --up-tint: rgba(249, 112, 102, 0.1);
+    --up: #3dd68c;
+    --down: #f97066;
+    --mark: rgba(250, 204, 21, 0.13);
+    --focus: #60a5fa;
   }
-  .brand-mark { background: #b93a31; }
-  .masthead { border-top-color: #b93a31; }
   th:first-child, td:first-child { box-shadow: 6px 0 8px -6px rgba(0, 0, 0, 0.45); }
   .skip-link { background: var(--ink); color: var(--bg); }
 }
