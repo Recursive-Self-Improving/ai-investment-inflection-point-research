@@ -1,2 +1,3 @@
 .run/
+.run_*.py
 __pycache__/
